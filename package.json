@@ -1,0 +1,21 @@
+{
+  "name": "glb-furniture-pipeline",
+  "version": "1.0.0",
+  "description": "Claude Code skill：AI 图生3D / 外部 GLB 家具接入 three.js 网页场景的完整管线（压缩 → 朝向验证 → 定位摆放 → CDP 无头验证 → 部署）",
+  "license": "MIT",
+  "keywords": ["claude-skill", "threejs", "gltf", "glb", "draco", "furniture", "cdp"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "analyze": "node scripts/vertex_analyze.mjs",
+    "serve": "node scripts/serve_local.js"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "4.4.2",
+    "@gltf-transform/extensions": "4.4.2",
+    "@gltf-transform/functions": "4.4.2",
+    "draco3dgltf": "1.5.7",
+    "meshoptimizer": "1.0.1"
+  }
+}

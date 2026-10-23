@@ -1,0 +1,8 @@
+node_modules/
+*.glb
+*.gltf
+*.zip
+_shots/
+_tex*/
+*.log
+.DS_Store
