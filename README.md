@@ -3,7 +3,7 @@
 > Claude Code skill：把 **AI 图生3D / 外部下载的 GLB 家具模型**接入 **three.js 网页场景**的完整管线。
 > 8 件家具实战跑通——单件 80~115MB 压到 1.9~2.3MB（约 -97%），手机端可加载。
 
-**压缩 → 朝向双路验证 → 定位摆放 → 本地 CDP 无头验证 → 部署**
+**压缩 → 朝向双路验证 → 定位摆放 → 接入场景页 → 本地 CDP 无头验证 → 部署**
 
 ## 安装
 
@@ -40,11 +40,13 @@ node scripts/vertex_analyze.mjs 家具_med.glb [--bins 12] [--layers 8] [--zup]
 # 本地静态服务器（验证用，带 no-store）
 node scripts/serve_local.js [站点根目录] [端口=8921]
 
-# 单模型四角度截图（先起 serve_local + headless Edge :9333）
-node scripts/cdp_shot.mjs <yaw> <pitch> <out.png> <模型.glb> [页面名] [端口]
+# 单模型四角度截图（先起 serve_local + headless Edge；端口为最后一位参数）
+node scripts/cdp_shot.mjs <yaw> <pitch> <out.png> <模型.glb> [页面名] [端口=9333]
 
 # 页面级验证：等 #loading 出现 hide 类 → console 收集 → 截图
 node scripts/cdp_page_test.mjs <页面.html> <out.png>
+# ⚠️ 默认 CDP 端口 9333，撞上本机别的服务（如淘宝桥）时换空闲口（坑 D6）：
+CDP_PORT=9444 node scripts/cdp_page_test.mjs <页面.html> <out.png>
 
 # VL 视觉朝向判定（SiliconFlow Qwen3-VL，只信"哪张图"，别信坐标轴结论）
 SF_KEY=sk-xxx node scripts/vl_orient_check.mjs --ref 正面参考.jpg --object 床 \
@@ -54,7 +56,7 @@ SF_KEY=sk-xxx node scripts/vl_orient_check.mjs --ref 正面参考.jpg --object �
 
 ## 为什么值得一条条踩出来
 
-这些坑全都真实踩过、并在 8 件家具上复验过解法，细节在 [references/pitfalls.md](references/pitfalls.md)：
+**22 条坑**全都真实踩过、并在 8 件家具 + 后续换画/双入口对齐中复验过解法，细节在 [references/pitfalls.md](references/pitfalls.md)：
 
 - 隐藏家具 = 隐形墙（raycaster 不管 `visible`，碰撞列表要显式移除）
 - GLTFLoader 会把节点名空格/点号改成下划线（gltf-transform 和浏览器看到的名字不一致）
@@ -68,6 +70,7 @@ SF_KEY=sk-xxx node scripts/vl_orient_check.mjs --ref 正面参考.jpg --object �
 - 8 件家具（沙发/床/床头柜×2/边桌/吊灯/地毯/书桌）全链路接入
 - 压缩率：80~115MB → 1.9~2.3MB；纹理 4096² → 1024（normal PNG / 其余 JPG q85）
 - 验证链路：顶点分析 + VL 四角度 + headless CDP 截图 + console 零异常，全部部署前完成
+- 案例流程复用：2026-10-23 卧室挂画换图（`case-geo-ops`）——本地 + 线上双 CDP 验证通过；同日 walk.html / walk_d3.html 整页对齐后线上 md5 一致 + Mist 入口端到端 PASS
 
 ## License
 
