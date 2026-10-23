@@ -40,3 +40,5 @@
 | D3 | Git Bash 路径转换 | 传 `/walk_test.html` 变成 `C:/Program Files/Git/walk_test.html` | MSYS 把 `/xxx` 参数转 Windows 路径 | 脚本**只收纯文件名**，内部补前缀 `/`；已内置怪路径兜底 |
 | D4 | file:// 缓存 | 改了 HTML 浏览器不生效 | 本地文件缓存 | URL 拼 `?fresh=<时间戳>`（CDP 脚本已内置）。必须走 serve_local.js 时同理 |
 | D5 | #loading 契约 | 脚本永远等不到 ready | 页面遮罩用 `style.display` 或没有 id | 页面契约：遮罩元素 `id="loading"`，加载完加**类名 `hide`**（不是 display）。`cdp_page_test.mjs` 按此轮询 |
+| D6 | 🔥 CDP 端口撞本地服务 | `curl :9333/json/version` 返回 `{"ok":false,"error":"只有 GET /health 和 POST /call"}`，脚本拿到的 target 是别的服务 | 9333 常被同机别的桥接服务占用（本机实测撞过一次） | **起 CDP 前先 `netstat` 挑空闲口**（如 9444），`CDP_PORT` 环境变量传给脚本；`json/version` 能认出 Chrome/Edge 才算连对 |
+| D7 | 🔥 SwiftShader 截图滞后 | 页面 `hide` 了、`computed opacity` 已 0、纹理 200，但 `captureScreenshot` 拿到的还是**旧帧**（黑屏/带遮罩） | headless 软渲染 ~1fps，合成帧落后主线程好几秒（2026-10-23 实测：遮罩 DOM 已淡出，截图仍显示遮罩） | ready 后**再等 ≥8 秒**再截图；拿不准就逐秒读 `getComputedStyle(loading).opacity` 确认后多等几帧。**首张截图异常先怀疑帧滞后，别急着改页面** |

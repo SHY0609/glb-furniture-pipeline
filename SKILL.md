@@ -138,6 +138,6 @@ scp 家具_med.glb 场景页.html 场景页_d3.html user@server:/var/www/site/
 
 ## 引用文档
 
-- `references/pitfalls.md` —— 16 条坑总表（现象 → 解法），出问题先查它
+- `references/pitfalls.md` —— 18 条坑总表（现象 → 解法），出问题先查它
 - `references/placement.md` —— 放置块完整模板、9 处接入点细节、碰撞代理做法、单轴改尺寸、clone 双件
 - `references/case-geo-ops.md` —— 案例：对场景内已有模型的内部物件做几何操作（换贴图/移位）的四个连环坑
