@@ -15,7 +15,7 @@ cd ~/.claude/skills/glb-furniture-pipeline && npm i
 
 依赖：Node ≥ 18 · python + Pillow · 本地 Edge/Chrome（headless 验证用）。
 
-装好后，对 Claude 说"接入这个 GLB 家具 / 这个图生3D 模型太大帮我压一下 / 家具朝向反了"就会自动触发本 skill；完整流程见 [SKILL.md](SKILL.md)。
+装好后，对 Claude 说"接入这个 GLB 家具 / 这个图生3D 模型太大帮我压一下 / 家具朝向反了"就会自动触发本 skill；完整流程见 [SKILL.md](SKILL.md)，使用说明 / 8 个使用场景 / 适配性评估见 [USAGE.md](USAGE.md)。
 
 ## 管线一览
 

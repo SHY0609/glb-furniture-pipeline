@@ -1,4 +1,4 @@
-# 坑全表（16 条，全部实战踩过）
+# 坑全表（22 条，全部实战踩过）
 
 按「现象 → 真因 → 解法」组织。场景页统称"场景页"（本 skill 不绑定具体项目）。
 
@@ -39,6 +39,7 @@
 | D2 | CDP /json/list 首个 tab 无关 | 页面测的是 Tampermonkey/设置页 | 复用了已有 tab | **一律 `PUT /json/new` 开专用 tab**，两个 CDP 脚本都已内置 |
 | D3 | Git Bash 路径转换 | 传 `/walk_test.html` 变成 `C:/Program Files/Git/walk_test.html` | MSYS 把 `/xxx` 参数转 Windows 路径 | 脚本**只收纯文件名**，内部补前缀 `/`；已内置怪路径兜底 |
 | D4 | file:// 缓存 | 改了 HTML 浏览器不生效 | 本地文件缓存 | URL 拼 `?fresh=<时间戳>`（CDP 脚本已内置）。必须走 serve_local.js 时同理 |
-| D5 | #loading 契约 | 脚本永远等不到 ready | 页面遮罩用 `style.display` 或没有 id | 页面契约：遮罩元素 `id="loading"`，加载完加**类名 `hide`**（不是 display）。`cdp_page_test.mjs` 按此轮询 |
+| D5 | #loading 契约 | 脚本永远等不到 ready | 页面遮罩用 `style.display` 或没有 id | 页面契约：遮罩元素 `id="loading"`，加载完加**类名 `hide`**（不是 display）。`cdp_page_test.mjs` 按此轮询。⚠️ **入口异形的页面不适用**：如 Mist 开屏版（无 loading 遮罩，就绪信号是按钮 `dataset.ready='true'` + 手动点击），要另写等待逻辑，别干等 `hide` 到超时 |
 | D6 | 🔥 CDP 端口撞本地服务 | `curl :9333/json/version` 返回 `{"ok":false,"error":"只有 GET /health 和 POST /call"}`，脚本拿到的 target 是别的服务 | 9333 常被同机别的桥接服务占用（本机实测撞过一次） | **起 CDP 前先 `netstat` 挑空闲口**（如 9444），`CDP_PORT` 环境变量传给脚本；`json/version` 能认出 Chrome/Edge 才算连对 |
 | D7 | 🔥 SwiftShader 截图滞后 | 页面 `hide` 了、`computed opacity` 已 0、纹理 200，但 `captureScreenshot` 拿到的还是**旧帧**（黑屏/带遮罩） | headless 软渲染 ~1fps，合成帧落后主线程好几秒（2026-10-23 实测：遮罩 DOM 已淡出，截图仍显示遮罩） | ready 后**再等 ≥8 秒**再截图；拿不准就逐秒读 `getComputedStyle(loading).opacity` 确认后多等几帧。**首张截图异常先怀疑帧滞后，别急着改页面** |
+| D8 | 🔥 启动参数路径含空格 | PowerShell `Start-Process -ArgumentList '--user-data-dir=D:\My Dir\_edge'` 起 Edge：进程秒退（或转投已开的默认 profile），端口**永不监听**，`/json/version` 连不上 | PowerShell 把 ArgumentList 数组 join 成命令行时**按空格拆词**，`D:\My Dir\_edge` 被劈成两个参数，后续参数全部错位 | 传给 `Start-Process`/`node -e` 的含路径参数**一律用无空格路径**（如 `%TEMP%\_edge_xxx`），或手工包双层引号 `--user-data-dir="D:\My Dir\x"`。Git Bash 侧还有 MSYS 把 `/xxx` 转 Windows 路径的同类坑（D3）。**症状是"端口起不来"时，先查路径空格，别怀疑 Edge 坏了** |
